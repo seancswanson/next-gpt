@@ -15,9 +15,9 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-24">
       <h1 className="text-6xl font-bold">NextGPT</h1>
-      <button onClick={callAPI}>Call API</button>
+      <button onClick={callAPI} className="border-white border rounded px-3 py-2 hover:bg-white hover:text-black">Call API</button>
     </main>
   )
 }
