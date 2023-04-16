@@ -1,27 +1,88 @@
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ subsets: ["latin"] });
+// App.tsx
+import ChatArea from "@/components/ChatArea/ChatArea";
+import { faCog } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect,useState } from "react";
+import { ResizeCallbackData } from "react-resizable";
+import { useMediaQuery } from "react-responsive";
+import ResizableSection from "../components/ResizableSection";
+import FooterLinks from "@/components/Sidebar/FooterLinks";
+import ConversationHistory from "@/components/Sidebar/ConversationHistory";
 
 export default function Home() {
-  const callAPI = async () => {
-    try {
-      const res = await fetch("/api/gpt");
-      const data = await res.json();
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-    }
+  const isLargeScreen = useMediaQuery({ minWidth: 1024 }); // Adjust the breakpoint as needed
+  const [sectionWidths, setSectionWidths] = useState<number[]>([]);
+  useEffect(() => {
+    setSectionWidths([0.3, 0.7]);
+  }, []);
+
+
+const handleResize =
+  (index: number) =>
+  (event: React.SyntheticEvent<Element, Event>, data: ResizeCallbackData) => {
+    const width = data.size.width;
+    const totalWidth = window.innerWidth;
+    const updatedWidths = [...sectionWidths];
+    updatedWidths[index] = width / totalWidth;
+    updatedWidths[index + 1] = 1 - updatedWidths[index];
+    setSectionWidths(updatedWidths);
   };
 
+  if (sectionWidths.length === 0) {
+    return null; // Or return a loading indicator
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-24">
-      <h1 className="text-6xl font-bold font-sans">NextGPT</h1>
-      <button
-        onClick={callAPI}
-        className="rounded border border-white px-3 py-2 hover:bg-white hover:text-black"
-      >
-        Call API
-      </button>
-    </main>
+    <div className="h-screen flex-col overflow-hidden lg:flex lg:flex-row">
+      {isLargeScreen ? (
+        <ResizableSection
+          width={sectionWidths[0] * window.innerWidth}
+          minWidth={100}
+          onResize={handleResize(0)}
+        >
+          <div className="h-full bg-gray-200 p-4">
+            <ConversationHistory />
+            <FooterLinks />{" "}
+          </div>
+        </ResizableSection>
+      ) : (
+        <div className="order-1 h-1/3 w-full bg-gray-200 p-4">
+          <ConversationHistory />
+          <FooterLinks />{" "}
+        </div>
+      )}
+      {isLargeScreen ? (
+        <div
+          className="flex h-full flex-col p-4"
+          style={{ width: `${sectionWidths[1] * 100}%` }}
+        >
+          {/* Top bar with API/conversation parameters and settings icon */}
+          <div className="mb-2 flex items-center justify-between bg-gray-300 p-2">
+            <div className="text-sm">
+              {/* Add API or conversation parameters here */}
+              API Parameter: Value
+            </div>
+            <button className="text-gray-700">
+              <FontAwesomeIcon icon={faCog} />
+            </button>
+          </div>
+          <ChatArea />
+        </div>
+      ) : (
+        <div className="order-3 flex h-1/3 w-full flex-col p-4">
+          {/* Top bar with API/conversation parameters and settings icon */}
+          <div className="mb-2 flex items-center justify-between bg-gray-300 p-2">
+            <div className="text-sm">
+              {/* Add API or conversation parameters here */}
+              API Parameter: Value
+            </div>
+            <button className="text-gray-700">
+              <FontAwesomeIcon icon={faCog} />
+            </button>
+          </div>
+          <ChatArea />
+        </div>
+      )}
+    </div>
   );
 }
