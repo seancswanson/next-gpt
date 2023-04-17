@@ -1,5 +1,4 @@
 // components/ChatArea.tsx
-
 import { useState } from "react";
 
 const ChatArea = () => {
