@@ -63,9 +63,6 @@ const ChatSettings = (props: PropData) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  useEffect(() => {
-    console.log("modelToChange", modelToChange);
-  }, [modelToChange]);
 
   const handleSubmit = (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,8 +71,6 @@ const ChatSettings = (props: PropData) => {
 
     props.setChatSettings(formData);
     console.log(formData);
-    // Or send it to a server if needed
-    // axios.post("/api/save-settings", formData);
   };
 
   return (
@@ -128,11 +123,11 @@ const ChatSettings = (props: PropData) => {
           <div className="flex gap-4">
             {[
               {
-                value: "text-davinci-002",
+                value: "text-davinci-003",
                 label: "Davinci",
                 cost: "Most Powerful",
                 price: 0.02,
-                isSelected: props.chatSettings.model === "text-davinci-002",
+                isSelected: props.chatSettings.model === "text-davinci-003",
               },
               {
                 value: "text-curie-002",
