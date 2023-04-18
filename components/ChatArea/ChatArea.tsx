@@ -8,6 +8,13 @@ interface PropData {
 
 const ChatArea = (props: PropData) => {
   const [userInput, setUserInput] = useState("");
+  const [chatSettings, setChatSettings] = useState({
+    temperature: 0.8,
+    maxTokens: 50,
+    model: "text-davinci-002",
+    language: "en",
+    instructions: ""
+  });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUserInput(event.target.value);
@@ -16,7 +23,8 @@ const ChatArea = (props: PropData) => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     // Process the user input, e.g. send a request to the ChatGPT API
-    console.log("Submitted input:", userInput);
+    console.log("Submitted input:", userInput, chatSettings);
+
 
     // Clear the input field after submitting
     setUserInput("");
@@ -50,7 +58,7 @@ const ChatArea = (props: PropData) => {
   };
 
   const renderSettings = () => {
-    return <ChatSettings />;
+    return <ChatSettings chatSettings={chatSettings} setChatSettings={setChatSettings}/>;
   };
   return props.showSettings ? renderSettings() : renderChat();
 };

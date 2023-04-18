@@ -21,7 +21,7 @@ export default function Home() {
   const [sectionWidths, setSectionWidths] = useState<number[]>([]);
 
   useEffect(() => {
-    setSectionWidths([0.3, 0.7]);
+    setSectionWidths([0.2, 0.8]);
   }, []);
 
   const toggleSidebar = () => {
@@ -48,7 +48,7 @@ export default function Home() {
       {showSidebarLarge && (
         <ResizableSection
           width={sectionWidths[0] * window.innerWidth}
-          minWidth={100}
+          minWidth={300}
           onResize={handleResize(0)}
         >
           <div className="flex h-full flex-col bg-gray-200 p-4">

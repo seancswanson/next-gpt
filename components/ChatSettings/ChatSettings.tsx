@@ -1,6 +1,6 @@
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { ChangeEvent,useEffect,useState } from "react";
 
 import GlossaryModal from "./GlossaryModal";
 
@@ -9,6 +9,19 @@ interface FormItemProps {
   htmlFor: string;
   children: React.ReactNode;
   onIconClick: () => void;
+}
+
+interface ChatSettingsObj {
+  temperature: number;
+  maxTokens: number;
+  model: string;
+  language: string;
+  instructions: string;
+}
+
+interface PropData {
+  chatSettings: ChatSettingsObj;
+  setChatSettings: (data: ChatSettingsObj) => void;
 }
 
 const FormItem = ({ label, htmlFor, children, onIconClick }: FormItemProps) => {
@@ -37,24 +50,29 @@ const FormItem = ({ label, htmlFor, children, onIconClick }: FormItemProps) => {
   );
 };
 
-const ChatSettings = () => {
+const ChatSettings = (props: PropData) => {
   const [openGlossaryModal, setOpenGlossaryModal] = useState(false);
-  const [formData, setFormData] = useState({
-    temperature: 0.8,
-    maxTokens: 50,
-    model: "text-davinci-002",
-    language: "en",
-    instructions: "",
-  });
+  const [modelToChange, setModelToChange] = useState("");
+  const [formData, setFormData] = useState(props.chatSettings);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>, setting?: string) => {
+    if (setting === "model") {
+      setModelToChange(e.target.value);
+    }
+
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: any) => {
+  useEffect(() => {
+    console.log("modelToChange", modelToChange);
+  }, [modelToChange]);
+
+  const handleSubmit = (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Save the formData JSON object to local storage
     localStorage.setItem("chatSettings", JSON.stringify(formData));
+
+    props.setChatSettings(formData);
     console.log(formData);
     // Or send it to a server if needed
     // axios.post("/api/save-settings", formData);
@@ -95,7 +113,7 @@ const ChatSettings = () => {
           <input
             className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
             id="max-tokens"
-            name="max-tokens"
+            name="maxTokens"
             type="number"
             placeholder="Enter max tokens"
             value={formData.maxTokens}
@@ -114,46 +132,57 @@ const ChatSettings = () => {
                 label: "Davinci",
                 cost: "Most Powerful",
                 price: 0.02,
+                isSelected: props.chatSettings.model === "text-davinci-002",
               },
               {
                 value: "text-curie-002",
                 label: "Curie",
                 cost: "Expensive",
                 price: 0.002,
+                isSelected: props.chatSettings.model === "text-curie-002",
               },
               {
                 value: "text-babbage-002",
                 label: "Babbage",
                 cost: "Less Expensive",
                 price: 0.0005,
+                isSelected: props.chatSettings.model == "text-babbage-002",
               },
               {
                 value: "text-ada-002",
                 label: "Ada",
                 cost: "Fastest",
                 price: 0.0004,
+                isSelected: props.chatSettings.model === "text-ada-002",
               },
-            ].map(({ value, label, cost, price }) => {
+            ].map(({ value, label, cost, price, isSelected }) => {
               const pricePer750Words = (price * 750) / 1000;
-
               return (
                 <label
                   key={value}
                   htmlFor={value}
                   className="flex cursor-pointer flex-col items-center"
                 >
-                  <div className="relative  h-16 w-16 rounded-md border-2 border-gray-300 p-1 ">
+                  <div
+                    className={`border-2 ${
+                      isSelected
+                        ? "border-black" // Add a different border color for the currently selected model
+                        : modelToChange === value
+                        ? "border-black border-dashed" // Add a different border color for the hovered model
+                        : "border-gray-400"
+                    } relative h-16 w-16 rounded-md p-1 hover:border-gray-700`}
+                  >
                     <span className="absolute left-0 top-[20%] w-full text-center text-4xl font-bold">
                       {label.slice(0, 2)}{" "}
                     </span>
                     <input
-                      className="h-full w-full cursor-pointer appearance-none rounded-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                      className={`h-full w-full cursor-pointer appearance-none rounded-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500 `}
                       type="radio"
                       id={value}
                       name="model"
                       value={value}
                       checked={formData.model === value}
-                      onChange={handleChange}
+                      onChange={(e) => handleChange(e, "model")}
                     />
                   </div>
                   <div className="mt-1 text-center">
